@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuck Norris API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: larger;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: larger;
+            align-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: larger;
+        }
+
+        #header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #gif {
+            width: 40%;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">Chuck Norris API</div>
+    <img id="gif" src="https://media.tenor.com/yizRGznfxbUAAAAM/chuck-norris.gif">
+    <label for="lista">Selecciona una categoría:</label>
+    <select id="lista"></select>
+    <button id="enviar">Enviar</button>
+    <div id="resultado"></div>
+
+    <script>
+        window.onload = () => {
+            fetch("https://api.chucknorris.io/jokes/categories")
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(categoria => {
+                        const opcion = document.createElement("option");
+                        opcion.value = categoria;
+                        opcion.text = categoria;
+                        document.getElementById("lista").appendChild(opcion);
+                    });
+                });
+        };
+        document.getElementById("enviar").addEventListener("click", () => {
+            fetch(`https://api.chucknorris.io/jokes/random?category=${document.getElementById("lista").value}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("resultado").innerHTML = `<p>${data.value}</p>`;
+                });
+            });
+    </script>
+</body>
+</html>
+
