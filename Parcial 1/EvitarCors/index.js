@@ -1,12 +1,10 @@
 const express = require('express')
 const app = express()
 
-app.use(express.json())
+//app.use(express.json())
 app.get("/alumnos/:carrera", (req,res)=>{
-    console.log(req.params);
-    console.log(req.query);
-    console.log(req.body);
-    res.send("servidor express contestando a peticion get")
+    res.json({respuesta: "contestando a peticion get en ruta empleada"})
+    //res.send("servidor express contestando a peticion get")
 })
 app.post("/alumnos", (req,res)=>{
     res.send("servidor express contestando a peticion post")

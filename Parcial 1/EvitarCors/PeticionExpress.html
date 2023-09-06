@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form target="resultado" method="GET" action="http://localhost:8081/alumnos/sistemas">
+        <button type="button" id="btn">Peticion fetch</button>
+        <button type="submit" id="btn">Peticion submit</button>
+    </form>
+<iframe name="resultado"></iframe>
+</body>
+<script>
+    document.getElementById("btn").addEventListener("click",()=>
+    {
+        fetch("http://localhost:8081/alumnos/sistemas")
+            .then(respuesta=>respuesta.json())
+                .then(dato=>console.log(dato))
+    })
+</script>
+</html>
