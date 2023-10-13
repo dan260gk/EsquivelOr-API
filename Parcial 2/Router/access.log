@@ -1,0 +1,6 @@
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:43 +0000] "GET /alumnos/sistemas HTTP/1.1" 404 155 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:55 +0000] "GET /alumnos HTTP/1.1" 200 43 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:56 +0000] "GET /alumnos HTTP/1.1" 200 43 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:57 +0000] "GET /alumnos HTTP/1.1" 200 43 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:57 +0000] "GET /alumnos HTTP/1.1" 200 43 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Sep/2023:13:38:57 +0000] "GET /alumnos HTTP/1.1" 200 43 "-" "Thunder Client (https://www.thunderclient.com)"

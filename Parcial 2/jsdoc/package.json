@@ -9,5 +9,8 @@
   "keywords": [],
   "author": "Jesus Esquivel",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "clean-jsdoc-theme": "^4.2.13"
+  }
 }

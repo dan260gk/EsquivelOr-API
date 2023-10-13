@@ -12,4 +12,4 @@ const validation=(schema)=>{
     }    
     return joiVa1idation;
 }
-module. exports= validation;
+module.exports=validation;

@@ -1,0 +1,17 @@
+{
+  "name": "randomstatusecma",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "doc": "jsdoc -c jsdoc.json --readme README.MD"
+  },
+  "keywords": [],
+  "author": "Jesus Esquivel",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "clean-jsdoc-theme": "^4.2.13"
+  }
+}
