@@ -1,16 +1,15 @@
 const express = require('express')
-const jwt=require('jsonwebtoken')
 const dotenv=require('dotenv')
-const router =require('./auth.js')
+const auth = require('./auth.js')
 
-dotenv.config()
+dotenv.config({path:"C:/wamp64/www/EsquivelOr-API/Parcial 2/servidorJWT/.env"});
 
 const app = express()
 const PORT = process.env.PORT
 
 app.use(express.json())
-app.use('/auth', authRouter)
+app.use('/auth', auth.authRouter)
 
-app.listen(PORT,(req,res)=>{
-    console.log("servidor express escuchando"+ PORT)
+app.listen(PORT,()=>{
+    console.log("servidor express escuchando "+PORT)
 })
