@@ -17,7 +17,8 @@ app.get("/alumnos", (req,res)=>{
 //     console.log("servidor express  escuchando")
 // })
 
+
 https.createServer(opciones,app).listen(8081,function()
 {
-    console.log("servidor express seguro en puerto 8082")
+    console.log("servidor express seguro en puerto 8081")
 })
