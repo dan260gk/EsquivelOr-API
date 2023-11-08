@@ -12,12 +12,23 @@ authRouter.get ('/',(req,res)=>{
 })
 authRouter.post('/login',async (req,res)=>{
     const {user,password}= req.body
+    const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'login'})
     console.log(`el usuario ${user} esta intentando acceder`)
-
-    if(user=='admin' && password == 'admin'){
-        return res.status(201).json({
-            token: jwt.sign({user:'admin'},SECRET_KEY)
-        })
+    const [row, fields] = await conn.promise().query('SELECT * FROM usuarios where user=\''+user+'\'')
+    
+    if(row.length==0){
+        res.status(404).json({mensaje:"el usuario no existe"})
+    }
+    else{
+        if(row[0].password==password)
+        {
+            return res.status(201).json({
+                token: jwt.sign({user:'admin'},SECRET_KEY)
+            })
+        }
+        else{
+            res.status(401).json({mensaje:"la contraseña es incorrecta"})
+        }
     }
 })
 
