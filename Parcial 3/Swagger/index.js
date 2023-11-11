@@ -27,6 +27,18 @@ const swaggerOptions = {
 app.use(cors())
 app.use(express.json())
 
+/**
+ * @swagger
+ * /usuarios/:
+ *   get:
+ *     tags:
+ *       - usuarios
+ *     summary: Consultar todos los usuarios
+ *     description: Obtiene un Json que contiene a todos los usuarios de la Base de Datos
+ *     responses:
+ *       200:
+ *         description: Regresa un Json con todos los usuarios
+ */
 app.get("/usuarios", async(req,res)=>{
   try {
     const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
@@ -36,6 +48,7 @@ app.get("/usuarios", async(req,res)=>{
     res.status(500).json({mensaje:err.sqlMessage})
   }
 })
+
 
 
 app.get("/usuarios/:id", async(req,res)=>{
