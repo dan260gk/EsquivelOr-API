@@ -16,7 +16,10 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.6.0",
     "openapi-snippet": "^0.14.0",
+    "redoc-express": "^2.1.0",
     "swagger-jsdoc": "^6.2.8",
+    "swagger-themes": "^1.2.30",
+    "swagger-ui": "^5.10.3",
     "swagger-ui-express": "^5.0.0"
   }
 }

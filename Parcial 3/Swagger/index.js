@@ -8,6 +8,7 @@ const { SwaggerTheme } = require('swagger-themes');//
 const swaggerJsDoc=require('swagger-jsdoc')
 const redoc = require('redoc-express');
 
+
 var app = express()
 const theme = new SwaggerTheme('v3');
 
@@ -29,105 +30,354 @@ const swaggerOptions = {
   apis: [`${path.join(__dirname, "./index.js")}`],
 }
 
-// const swaggerOptions = {
-//   definition: {
-//     openapi: '3.0.0',
-//     info: {
-//       title: 'API Usuarios',
-//       version: '1.0.0',
-//     },
-//     servers: [
-//       { url: "http://localhost:8081" }
-//     ],
-//   },
-//   apis: [`${path.join(__dirname, "./index.js")}`],
-// };
-
-
 app.use(cors())
 app.use(express.json())
 
 /**
  * @swagger
- * /usuarios/:
+ * /alumnos:
  *   get:
  *     tags:
- *       - usuarios
- *     summary: Consultar todos los usuarios
- *     description: Obtiene un Json que contiene a todos los usuarios de la Base de Datos
+ *       - alumnos
+ *     summary: Consultar todos los alumnos
+ *     description: Obtiene un JSON que contiene a todos los alumnos de la Base de Datos.
  *     responses:
  *       200:
- *         description: Regresa un Json con todos los usuarios
+ *         description: Regresa un JSON con todos los alumnos.
+ *         content:
+ *           application/json:
+ *             example:
+ *               [
+ *                 {
+ *                   "id": 1,
+ *                   "nombre": "Ejemplo",
+ *                   "apellido": "Apellido"
+ *                 },
+ *               ]
+ *       500:
+ *         description: Error interno del servidor al intentar consultar los alumnos.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
  */
-app.get("/usuarios", async(req,res)=>{
+
+app.get("/alumnos", async (req, res) => {
   try {
-    const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
-    const [rows, fields] = await conn.promise().query('SELECT * FROM alumnos')
-    res.json(rows)
-  } catch (err){
-    res.status(500).json({mensaje:err.sqlMessage})
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'test',
+      password: 'test',
+      database: 'sistemas'
+    });
+
+    // Consulta a la base de datos para obtener información de todos los alumnos.
+    const [rows, fields] = await conn.promise().query('SELECT * FROM alumnos');
+
+    // Respondemos con un JSON que contiene la información de todos los alumnos.
+    res.status(200).json(rows);
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
   }
-})
+});
 
 
+/**
+ * @swagger
+ * /alumno/{id}:
+ *   get:
+ *     tags:
+ *       - alumnos
+ *     summary: Consultar información de un alumno por ID
+ *     description: Obtiene un JSON con la información del alumno correspondiente al ID proporcionado.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID del alumno a consultar
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Regresa un JSON con la información del alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               [
+ *                 {
+ *                   "id": 1,
+ *                   "nombre": "Ejemplo",
+ *                   "apellido": "Apellido"
+ *                 }
+ *               ]
+ *       404:
+ *         description: No se encontró ningún alumno con el ID proporcionado.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El alumno no existe.
+ *       500:
+ *         description: Error interno del servidor al intentar consultar la información del alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
+ */
 
-app.get("/usuarios/:id", async(req,res)=>{
-  console.log(req.params.id)
-  const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
-  const [rows, fields] = await conn.promise().query('SELECT * FROM alumnos where control='+req.params.id)
-  if(rows.length==0){
-    res.status(404).json({mensaje:"el usuario no existe"})
-  }
-  else{
-    res.json(rows)
-  }
-})
-app.delete("/usuarios", async(req,res)=>{
+app.get("/alumno/:id", async (req, res) => {
+  console.log(req.params.id); // Se registra en la consola el ID del alumno obtenido de los parámetros de la solicitud.
+
   try {
-    const conn = await mysql.createConnection({host:'localhost',user:'root',password:'contrasena',database:'sistemas'})
-    const [rows, fields] = await conn.promise().query('DELETE FROM alumnos where control='+req.query.id)
-    res.json({mensaje:"el usuario ha sido eliminado correctamente"})
-  } catch (err){
-    res.status(500).json({mensaje:err.sqlMessage})
-  }
-})
-app.post("/usuarios", async(req,res)=>{
-  try {
-    const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
-    const [rows, fields] = await conn.promise().query("INSERT INTO `sistemas`.`alumnos` VALUES ('"+req.query.id+"', '"+req.query.nombre+"', '"+req.query.apellido+"');")
-    res.json(rows)
-  } catch (err){
-    res.status(500).json({mensaje:err.sqlMessage})
-  }
-})
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'test',
+      password: 'test',
+      database: 'sistemas'
+    });
 
-app.put("/usuarios/:id", async(req,res)=>{
-  let sentencia=""
-  let sentenciaUpdate ="UPDATE `alumnos` SET "
-  let sentenciaWhere = "WHERE control = "+req.params.id
-  let camposModificar =""
-  let campos = Object.keys(req.body);
-  var segundo = false
-  campos.forEach(campo => {
-    if (segundo==false){
-      camposModificar=camposModificar+("`"+campo+"` = '"+req.body[campo]+"' ")
-      segundo=true
+    // Consulta a la base de datos para obtener información del alumno con el ID proporcionado.
+    const [rows, fields] = await conn.promise().query('SELECT * FROM alumnos where control=' + req.params.id);
+
+    // Verificación si la consulta no devuelve ningún resultado (ningún alumno encontrado).
+    if (rows.length === 0) {
+      // Respondemos con un código de estado 404 y un mensaje indicando que el alumno no existe.
+      res.status(404).json({ mensaje: "El alumno no existe" });
+    } else {
+      // Si se encontraron resultados, respondemos con un JSON que contiene la información del alumno.
+      res.status(200).json(rows);
     }
-    else{
-      camposModificar=camposModificar+(", `"+campo+"` = '"+req.body[campo]+"' ")
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
+  }
+});
+
+
+/**
+ * @swagger
+ * /alumno:
+ *   delete:
+ *     tags:
+ *       - alumnos
+ *     summary: Eliminar un alumno por ID
+ *     description: Elimina un alumno de la Base de Datos según su ID.
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: ID del alumno a eliminar
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: El alumno ha sido eliminado correctamente.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El usuario ha sido eliminado correctamente.
+ *       404:
+ *         description: No se encontró ningún alumno con el ID proporcionado.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El alumno no existe.
+ *       500:
+ *         description: Error interno del servidor al intentar eliminar al alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
+ */
+
+app.delete("/alumno", async (req, res) => {
+  try {
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      password: 'contrasena',
+      database: 'sistemas'
+    });
+
+    // Eliminación del alumno de la base de datos según su ID.
+    const [rows, fields] = await conn.promise().query('DELETE FROM alumnos where control=' + req.query.id);
+
+    // Verificación si la eliminación fue exitosa.
+    if (rows.affectedRows === 0) {
+      // No se encontró ningún alumno con el ID proporcionado.
+      res.status(404).json({ mensaje: "El alumno no existe." });
+    } else {
+      // Respondemos con un mensaje indicando que el usuario ha sido eliminado correctamente.
+      res.status(200).json({ mensaje: "El usuario ha sido eliminado correctamente." });
+    }
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
+  }
+});
+
+
+
+/**
+ * @swagger
+ * /alumno:
+ *   post:
+ *     tags:
+ *       - alumnos
+ *     summary: Agregar un nuevo alumno
+ *     description: Agrega un nuevo alumno a la Base de Datos.
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: ID del nuevo alumno
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - name: nombre
+ *         in: query
+ *         description: Nombre del nuevo alumno
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: apellido
+ *         in: query
+ *         description: Apellido del nuevo alumno
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: El nuevo alumno ha sido agregado correctamente.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El nuevo alumno ha sido agregado correctamente.
+ *       500:
+ *         description: Error interno del servidor al intentar agregar el nuevo alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
+ */
+
+app.post("/alumno", async (req, res) => {
+  try {
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'test',
+      password: 'test',
+      database: 'sistemas'
+    });
+
+    // Inserción del nuevo alumno en la base de datos con la información proporcionada.
+    const [rows, fields] = await conn.promise().query("INSERT INTO `sistemas`.`alumnos` VALUES ('" + req.query.id + "', '" + req.query.nombre + "', '" + req.query.apellido + "');");
+
+    // Respondemos con un JSON que contiene información sobre la inserción exitosa del nuevo alumno.
+    res.status(200).json({ mensaje: "El nuevo alumno ha sido agregado correctamente." });
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
+  }
+});
+
+
+/**
+ * @swagger
+ * /alumno/{id}:
+ *   put:
+ *     tags:
+ *       - alumnos
+ *     summary: Actualizar información de un alumno por ID
+ *     description: Actualiza la información de un alumno en la Base de Datos según su ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID del alumno a actualizar
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - name: body
+ *         in: body
+ *         description: Campos a actualizar en el alumno
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             nombre:
+ *               type: string
+ *             apellido:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: La información del alumno ha sido actualizada correctamente.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: La información del alumno ha sido actualizada correctamente.
+ *       404:
+ *         description: No se encontró ningún alumno con el ID proporcionado.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El alumno no existe.
+ *       500:
+ *         description: Error interno del servidor al intentar actualizar la información del alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
+ */
+
+
+app.put("/alumno/:id", async (req, res) => {
+  // Construcción de la sentencia SQL para actualizar la información del alumno.
+  let sentencia = "";
+  let sentenciaUpdate = "UPDATE `alumnos` SET ";
+  let sentenciaWhere = 'WHERE control = ' + req.params.id ;
+  let camposModificar = "";
+  let campos = Object.keys(req.body);
+  var segundo = false;
+  campos.forEach(campo => {
+    if (segundo == false) {
+      camposModificar = camposModificar + ("`" + campo + "` = '" + req.body[campo] + "' ");
+      segundo = true;
+    } else {
+      camposModificar = camposModificar + (", `" + campo + "` = '" + req.body[campo] + "' ");
     }
   });
+  sentencia = sentenciaUpdate + camposModificar + sentenciaWhere;
+  console.log(sentencia);
+  try {
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'test',
+      password: 'test',
+      database: 'sistemas'
+    });
 
-  sentencia=sentenciaUpdate+camposModificar+sentenciaWhere
-  const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
-  const [rows, fields] = await conn.promise().query(sentencia)
-  if(rows.length==0){
-    res.status(404).json({mensaje:"el usuario no existe"})
+    // Ejecución de la sentencia SQL para actualizar la información del alumno.
+    const [rows, fields] = await conn.promise().query(sentencia);
+
+    // Verificación si la actualización fue exitosa.
+    if (rows.affectedRows === 0) {
+      // No se encontró ningún alumno con el ID proporcionado.
+      res.status(404).json({ mensaje: "El alumno no existe." });
+    } else {
+      // Respondemos con un mensaje indicando que la información del alumno ha sido actualizada correctamente.
+      res.status(200).json({ mensaje: "La información del alumno ha sido actualizada correctamente." });
+    }
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
   }
-  else{
-    res.json(rows)
-  }
-})
+});
+
+
 
 var algo;
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -141,10 +391,7 @@ app.get(
   redoc({
     title: 'API Docs',
     specUrl: '/api-docs-json',
-    nonce: '', // <= it is optional,we can omit this key and value
-    // we are now start supporting the redocOptions object
-    // you can omit the options object if you don't need it
-    // https://redocly.com/docs/api-reference-docs/configuration/functionality/
+    nonce: '', 
     redocOptions: {
       theme: {
         colors: {

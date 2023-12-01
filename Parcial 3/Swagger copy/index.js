@@ -100,34 +100,95 @@ app.post("/usuarios", async(req,res)=>{
     res.status(500).json({mensaje:err.sqlMessage})
   }
 })
-
-app.put("/usuarios/:id", async(req,res)=>{
-  let sentencia=""
-  let sentenciaUpdate ="UPDATE `alumnos` SET "
-  let sentenciaWhere = "WHERE control = "+req.params.id
-  let camposModificar =""
+/**
+ * @swagger
+ * /alumno/{id}:
+ *   put:
+ *     tags:
+ *       - alumnos
+ *     summary: Actualizar información de un alumno por ID
+ *     description: Actualiza la información de un alumno en la Base de Datos según su ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID del alumno a actualizar
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - name: body
+ *         in: body
+ *         description: Campos a actualizar en el alumno
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             nombre:
+ *               type: string
+ *             apellido:
+ *               type: string
+ *     responses:
+ *       200:
+ *         description: La información del alumno ha sido actualizada correctamente.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: La información del alumno ha sido actualizada correctamente.
+ *       404:
+ *         description: No se encontró ningún alumno con el ID proporcionado.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: El alumno no existe.
+ *       500:
+ *         description: Error interno del servidor al intentar actualizar la información del alumno.
+ *         content:
+ *           application/json:
+ *             example:
+ *               mensaje: Mensaje de error específico generado por la base de datos.
+ */
+app.put("/alumno/:id", async (req, res) => {
+  // Construcción de la sentencia SQL para actualizar la información del alumno.
+  let sentencia = "";
+  let sentenciaUpdate = "UPDATE `alumnos` SET ";
+  let sentenciaWhere = 'WHERE control = ' + req.params.id ;
+  let camposModificar = "";
   let campos = Object.keys(req.body);
-  var segundo = false
+  var segundo = false;
   campos.forEach(campo => {
-    if (segundo==false){
-      camposModificar=camposModificar+("`"+campo+"` = '"+req.body[campo]+"' ")
-      segundo=true
-    }
-    else{
-      camposModificar=camposModificar+(", `"+campo+"` = '"+req.body[campo]+"' ")
+    if (segundo == false) {
+      camposModificar = camposModificar + ("`" + campo + "` = '" + req.body[campo] + "' ");
+      segundo = true;
+    } else {
+      camposModificar = camposModificar + (", `" + campo + "` = '" + req.body[campo] + "' ");
     }
   });
+  sentencia = sentenciaUpdate + camposModificar + sentenciaWhere;
+  console.log(sentencia);
+  try {
+    // Establecimiento de una conexión a la base de datos MySQL utilizando la información de conexión proporcionada.
+    const conn = await mysql.createConnection({
+      host: 'localhost',
+      user: 'test',
+      password: 'test',
+      database: 'sistemas'
+    });
 
-  sentencia=sentenciaUpdate+camposModificar+sentenciaWhere
-  const conn = await mysql.createConnection({host:'localhost',user:'test',password:'test',database:'sistemas'})
-  const [rows, fields] = await conn.promise().query(sentencia)
-  if(rows.length==0){
-    res.status(404).json({mensaje:"el usuario no existe"})
+    // Ejecución de la sentencia SQL para actualizar la información del alumno.
+    const [rows, fields] = await conn.promise().query(sentencia);
+
+    // Verificación si la actualización fue exitosa.
+    if (rows.affectedRows === 0) {
+      // No se encontró ningún alumno con el ID proporcionado.
+      res.status(404).json({ mensaje: "El alumno no existe." });
+    } else {
+      // Respondemos con un mensaje indicando que la información del alumno ha sido actualizada correctamente.
+      res.status(200).json({ mensaje: "La información del alumno ha sido actualizada correctamente." });
+    }
+  } catch (err) {
+    // En caso de un error, respondemos con un código de estado 500 y un mensaje de error específico.
+    res.status(500).json({ mensaje: err.sqlMessage });
   }
-  else{
-    res.json(rows)
-  }
-})
+});
 
 var algo;
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
